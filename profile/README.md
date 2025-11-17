@@ -17,11 +17,18 @@ Take a look to our docs in https://kubearchive.github.io/kubearchive
 
 KubeArchive consists of the following components:
 
-- Custom Resource Definition for `KubeArchiveConfig`
-- An operator that reconciles `KubeArchiveConfig` Custom Resources to create APIServerSource CRs and update the `sink-filters` `ConfigMap`
-- One or more APIServerSources that send cloud events to a sink
-- A sink that receives the cloud events and write the resource information in a DB based on the filters of `sink-filters` `ConfigMap`
-- A REST API server that facilitates the retrieval of the archived data
+- Custom Resource Definitions for `NamespaceKubeArchiveConfig`, `ClusterKubeArchiveConfig`, `NamespaceVacuumConfig`, and
+`GlobalVacuumConfig`
+- An operator that contains the following controllers:
+  - A controller that reconciles `NamespaceKubeArchiveConfig` Custom Resources to update a SinkFilters CR
+  - A controller that reconciles `ClusterKubeArchiveConfig` Custom Resources to update a
+SinkFilters CR
+  - A controller that reconciles `SinkFilters` CR to create watchers that receive resource updates from the Kubernetes API
+and sends the resources to a sink
+- Vacuums that run periodically to send cloud events to the sink based on configuration from `ClusterVacuumConfigs` and
+`NamespaceVacuumConfigs`
+- A sink that receives the cloud events and write the resource information in a DB
+- A REST API server that facilitates the retrieval of the archived data as well as logs from configured logging backends
 - A CLI that queries both the KubeArchive REST API and the k8s API to expose the resources
 
 The user interacts with KubeArchive by:
